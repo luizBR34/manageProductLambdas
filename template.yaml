@@ -1,0 +1,65 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  manageproduct
+
+  Sample SAM Template for manageproduct
+
+Globals:
+  Function:
+    Runtime: java17
+    Architectures:
+      - x86_64
+    MemorySize: 512
+    Timeout: 30
+    Environment:
+      Variables:
+        PRODUCTS_TABLE: !Ref ProductsTable
+
+Resources:
+  ProductsTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: productId
+        Type: Number
+
+  AddProductFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: ManageProductFunction
+      Handler: com.ecommerce.aws.lambda.CreateProductLambda::createProduct
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ProductsTable
+      Events:
+        ProductEvents:
+          Type: Api
+          Properties:
+            Path: /addproduct
+            Method: POST
+  ReadProductFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: ManageProductFunction
+      Handler: com.ecommerce.aws.lambda.ReadProductsLambda::readProducts
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref ProductsTable
+      Events:
+        ProductEvents:
+          Type: Api
+          Properties:
+            Path: /getproducts
+            Method: GET
+
+Outputs:
+  AddProductAPI:
+    Description: "API Gateway endpoint url for add products function."
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/addproduct"
+  AddProductFunction:
+    Description: "Add Product Lambda Function ARN"
+    Value: !GetAtt AddProductFunction.Arn
+  AddProductFunctionIamRole:
+    Description: "Add Product Lambda Function IAM Role ARN"
+    Value: !GetAtt AddProductFunctionRole.Arn
