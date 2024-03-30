@@ -23,7 +23,12 @@ Resources:
       PrimaryKey:
         Name: productId
         Type: Number
-
+  BatchProductsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${AWS::StackName}-${AWS::AccountId}-${AWS::Region}
+  ProductsTopic:
+    Type: AWS::SNS::Topic
   AddProductFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -52,6 +57,38 @@ Resources:
           Properties:
             Path: /getproducts
             Method: GET
+  ReadProductsBatchFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: ManageProductFunction
+      Handler: com.ecommerce.aws.lambda.ReadProductsBatchLambda::getS3Resource
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Sub ${AWS::StackName}-${AWS::AccountId}-${AWS::Region}
+        - SNSPublishMessagePolicy:
+            TopicName: !GetAtt ProductsTopic.TopicName
+      Environment:
+        Variables:
+          PRODUCTS_TOPIC: !Ref ProductsTopic
+      Events:
+        S3Event:
+          Type: S3
+          Properties:
+            Bucket: !Ref BatchProductsBucket
+            Events: s3:ObjectCreated:*
+  ListenProductsFromTopicFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: ManageProductFunction
+      Handler: com.ecommerce.aws.lambda.ListenProductsFromTopic::listenTopic
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ProductsTable
+      Events:
+        SNSEvent:
+          Type: SNS
+          Properties:
+            Topic: !Ref ProductsTopic
 
 Outputs:
   AddProductAPI:

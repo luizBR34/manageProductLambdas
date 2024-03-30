@@ -1,0 +1,18 @@
+[
+    {
+        "productId": 74322,
+        "productName": "Tv Samsung 60",
+        "productDescription": "Televisao da Samsung",
+        "productPrice": 8000.4,
+        "productStock": 7,
+        "productImageUrl": "https://a-static.mlcdn.com.br/450x450/smart-tv-samsung-50-polegadas-uhd-4k-3-hdmi-1-usb-processador-crystal-4k-tela-sem-limites-visual-livre-de-cabos-alexa-un50au7700gxzd/kabum/154975/f77c6ffe612eee7c8f1f8d90516ff0f0.jpeg"
+    },
+    {
+        "productId": 456766,
+        "productName": "Playstation 5",
+        "productDescription": "Video Game",
+        "productPrice": 5000.4,
+        "productStock": 3,
+        "productImageUrl": "www.teste.com"
+    }
+]

@@ -44,4 +44,16 @@ public class Product {
     public String getProductImageUrl() {
         return productImageUrl;
     }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "productId=" + productId +
+                ", productName='" + productName + '\'' +
+                ", productDescription='" + productDescription + '\'' +
+                ", productPrice=" + productPrice +
+                ", productStock=" + productStock +
+                ", productImageUrl='" + productImageUrl + '\'' +
+                '}';
+    }
 }
