@@ -31,18 +31,17 @@ public class ReadProductsBatchLambda {
                     record.getS3().getObject().getKey()).getObjectContent();
 
             try {
-                //logger.info("Reading data file from S3.");
+                logger.info("Reading data file from S3.");
                 List<Product> productList = Arrays.asList(objectMapper.readValue(s3ObjectInputStream,
                         Product[].class));
-                //logger.info(productList.toString());
+                logger.info(productList.toString());
                 s3ObjectInputStream.close();
-                //logger.info("Message being published to SNS.");
+                logger.info("Message being published to SNS.");
                 publishMessageToSNS(productList);
-
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                logger.error("Exception: ", e);
+                throw new RuntimeException("Error while processing S3 event: ", e);
             }
-
         });
 
     }

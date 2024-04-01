@@ -27,6 +27,8 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub ${AWS::StackName}-${AWS::AccountId}-${AWS::Region}
+  ProductsDLQ:
+    Type: AWS::SNS::Topic
   ProductsTopic:
     Type: AWS::SNS::Topic
   AddProductFunction:
@@ -62,6 +64,9 @@ Resources:
     Properties:
       CodeUri: ManageProductFunction
       Handler: com.ecommerce.aws.lambda.ReadProductsBatchLambda::getS3Resource
+      DeadLetterQueue:
+        Type: SNS
+        TargetArn: !Ref ProductsDLQ
       Policies:
         - S3ReadPolicy:
             BucketName: !Sub ${AWS::StackName}-${AWS::AccountId}-${AWS::Region}
@@ -89,6 +94,16 @@ Resources:
           Type: SNS
           Properties:
             Topic: !Ref ProductsTopic
+  ErrorHandlingFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: ManageProductFunction
+      Handler: com.ecommerce.aws.lambda.error.ErrorHandler::handler
+      Events:
+        SNSEvent:
+          Type: SNS
+          Properties:
+            Topic: !Ref ProductsDLQ
 
 Outputs:
   AddProductAPI:
