@@ -81,6 +81,20 @@ Resources:
           Properties:
             Bucket: !Ref BatchProductsBucket
             Events: s3:ObjectCreated:*
+  UpdateProductFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: ManageProductFunction
+      Handler: com.ecommerce.aws.lambda.UpdateProductLambda::updateProduct
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ProductsTable
+      Events:
+        ProductEvents:
+          Type: Api
+          Properties:
+            Path: /updateproduct
+            Method: PUT
   ListenProductsFromTopicFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:

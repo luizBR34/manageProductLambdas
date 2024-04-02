@@ -31,7 +31,7 @@ public class CreateProductLambda {
         productsTable.putItem(item);
 
         return new APIGatewayProxyResponseEvent()
-                .withStatusCode(200)
+                .withStatusCode(201)
                 .withBody("Product Created! ID: " + product.getProductId());
     }
 }
