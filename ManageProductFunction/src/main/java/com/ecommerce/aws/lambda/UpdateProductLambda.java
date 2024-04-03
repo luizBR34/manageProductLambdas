@@ -46,8 +46,6 @@ public class UpdateProductLambda {
                 .withKey(keyAttribute)
                 .withAttributeUpdates(updatedProductMap));
 
-        Map<String, AttributeValue> attributes = updateItemResult.getAttributes();
-
         return new APIGatewayProxyResponseEvent()
                 .withStatusCode(200)
                 .withBody("Product Updated! ID: " + product.getProductId());
